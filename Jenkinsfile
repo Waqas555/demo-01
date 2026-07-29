@@ -24,12 +24,10 @@ pipeline {
             steps{
                 withSonarQubeEnv('sonar'){
                     script {
-                        def scannerHome = tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation')
+                        def scannerHome = tool(name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation')
                         sh """${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=demo-01 \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${SONAR_URL} \
-                        -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        -Dsonar.sources=.
                         """
                     }
                 }
