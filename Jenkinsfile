@@ -2,7 +2,6 @@ pipeline {
     agent any
     tools {
         nodejs 'Node'
-        sonarQubeScannerMSBuild 'sonar'
     }
 
     environment {
@@ -24,13 +23,15 @@ pipeline {
         stage('code quality'){
             steps{
                 withSonarQubeEnv('sonar'){
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=demo-01 \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=$SONAR_HOST_URL \
-                    -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                    script {
+                        def scannerHome = tool(name: 'sonar', type: 'hudson.plugins.sonar.SonarRunnerInstallation')
+                        sh """${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=demo-01 \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        """
+                    }
                 }
             }
         }
