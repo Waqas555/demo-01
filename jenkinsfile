@@ -1,0 +1,43 @@
+stage('Checkout') {
+    steps {
+        checkout scm
+    }
+}
+
+stage('Install Dependencies') {
+    steps {
+        sh 'npm install'
+    }
+}
+
+stage('Build') {
+    steps {
+        sh 'docker build -t waqas-app .'
+        sh 'docker tag waqas-app waqas-app:latest'
+        sh 'docker push waqas-app:latest'
+    }
+}
+
+stage('Test') {
+    steps {
+        sh 'npm test'
+    }
+}
+
+stage('Deploy') {
+    steps {
+        sh 'kubectl apply -f kubernetes/deployment.yaml'
+    }
+}
+
+stage('Notify') {
+    steps {
+        echo 'Deployment completed successfully!'
+    }
+
+stage('Rollback') {
+    steps {
+        sh 'kubectl rollout undo deployment/waqas-app'
+        echo 'Deployment Rollback!'
+    }
+}
