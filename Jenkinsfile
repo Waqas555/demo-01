@@ -2,7 +2,13 @@ pipeline {
     agent any
     tools {
         nodejs 'Node'
+        sonarqube 'sonar'
     }   
+
+    environment {
+        SONAR_AUTH_TOKEN = credentials('sonartoken')
+        SONAR_URL = 'http://192.168.56.10:9000'
+    }
     stages {
         stage('github') {
             steps {
@@ -13,6 +19,18 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'npm test'
+            }
+        }
+        stage('code quality'){
+            steps{
+                withSonarQubeEnv('sonar'){
+                    sh """
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=demo-01 \
+                    -Dsonar.host.url=${env.SONAR_URL} \
+                    -Dsonar.login=${env.SONAR_AUTH_TOKEN}
+                    """
+                }
             }
         }
     }
