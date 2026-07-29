@@ -2,8 +2,8 @@ pipeline {
     agent any
     tools {
         nodejs 'Node'
-        // sonarqube 'sonar'
-    }   
+        sonarQubeScannerMSBuild 'sonar'
+    }
 
     environment {
         SONAR_AUTH_TOKEN = credentials('sonar-token')
@@ -24,12 +24,13 @@ pipeline {
         stage('code quality'){
             steps{
                 withSonarQubeEnv('sonar'){
-                    sh """
-                    mvn clean verify sonar:sonar \
+                    sh '''
+                    sonar-scanner \
                     -Dsonar.projectKey=demo-01 \
-                    -Dsonar.host.url=${env.SONAR_URL} \
-                    -Dsonar.login=${env.SONAR_AUTH_TOKEN}
-                    """
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                    '''
                 }
             }
         }
