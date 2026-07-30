@@ -7,6 +7,8 @@ pipeline {
     environment {
         SONAR_AUTH_TOKEN = credentials('sonar-token')
         SONAR_URL = 'http://192.168.56.10:9000'
+        IMAGE_NAME = 'demo-01'
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
     stages {
         stage('github') {
@@ -31,6 +33,23 @@ pipeline {
                         """
                     }
                 }
+            }
+        }
+        stage('docker build') {
+            steps {
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest .'
+            }
+        }
+        stage('trivy scan') {
+            steps {
+                sh '''
+                    trivy image \
+                        --severity HIGH,CRITICAL \
+                        --exit-code 0 \
+                        --no-progress \
+                        --format table \
+                        ${IMAGE_NAME}:${IMAGE_TAG}
+                '''
             }
         }
     }

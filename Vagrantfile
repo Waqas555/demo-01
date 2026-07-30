@@ -14,8 +14,8 @@ Vagrant.configure("2") do |config|
   # VirtualBox configuration
   config.vm.provider "virtualbox" do |vb|
     vb.name = "ubuntu-vm"
-    vb.memory = 4096   # 4 GB RAM
-    vb.cpus = 2        # 2 vCPUs
+    vb.memory = 6144   # 6 GB RAM
+    vb.cpus = 4        # 4 vCPUs
 
     # Optional performance tweaks
     # vb.customize ["modifyvm", :id, "--ioapic", "on"]
